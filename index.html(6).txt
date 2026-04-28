@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gémaflor — Pépinière & Jardinerie</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: { 50: '#f0faf0', 100: '#dbefdb', 200: '#b9dfb9', 300: '#86c986', 400: '#52ac52', 500: '#2d8f2d', 600: '#1f731f', 700: '#195b19', 800: '#154815', 900: '#0e3a0e' },
+            sage: { 50: '#f6f7f4', 100: '#e8ebe3', 200: '#d3d9c8', 300: '#b3bda2', 400: '#96a17f', 500: '#7a8666', 600: '#5f6a4f', 700: '#4c5540', 800: '#3f4536', 900: '#363b2f' },
+            terra: { 50: '#fef6ee', 100: '#fce8d0', 200: '#f9cea0', 300: '#f5ad67', 400: '#f08d3a', 500: '#e8701a', 600: '#cc5412', 700: '#a83e12', 800: '#8a3216', 900: '#722b15' },
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; }
+    .hero-gradient { background: linear-gradient(135deg, rgba(14,58,14,0.85) 0%, rgba(25,91,25,0.7) 50%, rgba(86,201,86,0.3) 100%); }
+    .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+    .review-card { transition: transform 0.3s ease; }
+    .review-card:hover { transform: scale(1.02); }
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .leaf-decoration::before { content: '🌿'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 2rem; }
+    .nav-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .star-filled { color: #f08d3a; }
+    .star-empty { color: #d3d9c8; }
+    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    .floating { animation: float 3s ease-in-out infinite; }
+    @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .grow-line { animation: grow 1.5s ease-out forwards; transform-origin: left; }
+    .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+    .mobile-menu.open { transform: translateX(0); }
+  </style>
+</head>
+<body class="bg-white text-sage-800 overflow-x-hidden">
+
+  <!-- Navigation -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur bg-white/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <a href="#" class="flex items-center gap-2">
+          <span class="text-2xl">🌱</span>
+          <span class="font-display text-2xl font-bold text-forest-800">Gémaflor</span>
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#about" class="text-sage-600 hover:text-forest-600 font-medium transition-colors">À propos</a>
+          <a href="#plants" class="text-sage-600 hover:text-forest-600 font-medium transition-colors">Nos plantes</a>
+          <a href="#reviews" class="text-sage-600 hover:text-forest-600 font-medium transition-colors">Avis</a>
+          <a href="#contact" class="text-sage-600 hover:text-forest-600 font-medium transition-colors">Contact</a>
+          <a href="#contact" class="bg-forest-600 hover:bg-forest-700 text-white px-5 py-2.5 rounded-full font-medium transition-colors">Nous rendre visite</a>
+        </div>
+        <button id="menuBtn" class="md:hidden p-2 text-sage-700">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-2xl p-8 flex flex-col gap-6">
+    <button id="closeMenuBtn" class="self-end p-2 text-sage-700">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <a href="#about" class="text-lg text-sage-700 hover:text-forest-600 font-medium mobile-link">À propos</a>
+    <a href="#plants" class="text-lg text-sage-700 hover:text-forest-600 font-medium mobile-link">Nos plantes</a>
+    <a href="#reviews" class="text-lg text-sage-700 hover:text-forest-600 font-medium mobile-link">Avis</a>
+    <a href="#contact" class="text-lg text-sage-700 hover:text-forest-600 font-medium mobile-link">Contact</a>
+    <a href="#contact" class="bg-forest-600 hover:bg-forest-700 text-white px-5 py-3 rounded-full font-medium text-center transition-colors mobile-link">Nous rendre visite</a>
+  </div>
+  <div id="overlay" class="fixed inset-0 bg-black/40 z-40 hidden"></div>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center overflow-hidden">
+    <div class="absolute inset-0">
+      <img src="http://static.photos/nature/1200x630/55" alt="Pépinière Gémaflor" class="w-full h-full object-cover">
+      <div class="hero-gradient absolute inset-0"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-0">
+      <div class="max-w-2xl">
+        <span class="inline-block bg-terra-400/90 text-white text-sm font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide">🌿 Production horticole locale</span>
+        <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+          Votre pépinière<br><span class="text-forest-200">au cœur de la nature</span>
+        </h1>
+        <p class="text-lg md:text-xl text-forest-100 mb-8 leading-relaxed max-w-xl">
+          Production horticole locale à Gerzat. Vente de fleurs, plants de légumes et arbustes deux fois par an. Une équipe dynamique et de bons conseils.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="#plants" class="bg-terra-500 hover:bg-terra-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg text-center">
+            Explorer nos plantes
+          </a>
+          <a href="#contact" class="border-2 border-white/40 hover:border-white text-white px-8 py-4 rounded-full font-semibold text-lg transition-all hover:bg-white/10 text-center">
+            Nous rendre visite
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 floating">
+      <i data-lucide="chevron-down" class="w-8 h-8 text-white/60"></i>
+    </div>
+  </section>
+
+  <!-- Info Bar -->
+  <section class="bg-forest-800 text-white py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="flex items-center gap-3">
+          <div class="bg-forest-700 p-2.5 rounded-lg">
+            <i data-lucide="map-pin" class="w-5 h-5 text-terra-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-forest-300 uppercase tracking-wider">Adresse</p>
+            <p class="font-medium text-sm">Les Bas Charmets, 63360 Gerzat</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-forest-700 p-2.5 rounded-lg">
+            <i data-lucide="mail" class="w-5 h-5 text-terra-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-forest-300 uppercase tracking-wider">Email</p>
+            <a href="mailto:contact@gemaflor.fr" class="font-medium text-sm hover:text-terra-400 transition-colors">contact@gemaflor.fr</a>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-forest-700 p-2.5 rounded-lg">
+            <i data-lucide="clock" class="w-5 h-5 text-terra-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-forest-300 uppercase tracking-wider">Horaires</p>
+            <p class="font-medium text-sm">Lun–Sam : 10h–12h / 14h–19h</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-forest-700 p-2.5 rounded-lg">
+            <i data-lucide="star" class="w-5 h-5 text-terra-400"></i>
+          </div>
+          <div>
+            <p class="text-xs text-forest-300 uppercase tracking-wider">Note</p>
+            <p class="font-medium text-sm">4.6/5 — 19 avis Google</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-20 md:py-28 bg-sage-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div class="relative fade-in">
+          <img src="http://static.photos/nature/640x360/88" alt="Notre pépinière" class="rounded-2xl shadow-xl w-full object-cover aspect-[4/3]">
+          <div class="absolute -bottom-6 -right-6 bg-forest-600 text-white p-6 rounded-2xl shadow-lg hidden md:block">
+            <p class="text-4xl font-bold font-display">2</p>
+            <p class="text-forest-200 text-sm">Ventes par an</p>
+          </div>
+        </div>
+        <div class="fade-in">
+          <span class="text-terra-500 font-semibold text-sm uppercase tracking-wider">Qui sommes-nous</span>
+          <h2 class="font-display text-3xl md:text-4xl font-bold text-forest-900 mt-3 mb-6">Production horticole locale à Gerzat</h2>
+          <p class="text-sage-600 leading-relaxed mb-6">
+            Installée à Gerzat dans le Puy-de-Dôme, <strong>Gémaflor</strong> est une pépinière spécialisée dans la production horticole locale. Nous proposons des fleurs, des plants de légumes, des plantes aromatiques et de petits arbustes pour embellir vos jardins et potagers.
+          </p>
+          <p class="text-sage-600 leading-relaxed mb-8">
+            Nos ventes ont lieu deux fois par an : une au printemps et une à la Toussaint. Une équipe dynamique et passionnée vous accueille pour vous conseiller et vous aider à choisir les variétés les plus adaptées à votre terrain.
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex items-start gap-3">
+              <div class="bg-forest-100 p-2 rounded-lg mt-0.5">
+                <i data-lucide="leaf" class="w-5 h-5 text-forest-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-forest-900">Production locale</p>
+                <p class="text-sm text-sage-500">Cultivées sur place</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="bg-forest-100 p-2 rounded-lg mt-0.5">
+                <i data-lucide="heart" class="w-5 h-5 text-forest-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-forest-900">Conseils personnalisés</p>
+                <p class="text-sm text-sage-500">Équipe dynamique</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="bg-forest-100 p-2 rounded-lg mt-0.5">
+                <i data-lucide="sun" class="w-5 h-5 text-forest-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-forest-900">Printemps & Toussaint</p>
+                <p class="text-sm text-sage-500">2 ventes par an</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="bg-forest-100 p-2 rounded-lg mt-0.5">
+                <i data-lucide="sprout" class="w-5 h-5 text-forest-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-forest-900">Potager & fleurs</p>
+                <p class="text-sm text-sage-500">Large choix de variétés</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Plants / Products Section -->
+  <section id="plants" class="py-20 md:py-28 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14 fade-in">
+        <span class="text-terra-500 font-semibold text-sm uppercase tracking-wider">Nos catégories</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-forest-900 mt-3 mb-4">Des plantes pour chaque saison</h2>
+        <p class="text-sage-500 text-lg">Explorez notre sélection de végétaux, plantes potagères et fleurs, soigneusement cultivés dans notre pépinière.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/22" alt="Plantes potagères" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-forest-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full">Populaire</div>
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Plantes potagères</h3>
+            <p class="text-sage-500 text-sm mb-4">Tomates, courgettes, poivrons, aubergines… Tout pour un potager productif et gourmand.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 2,50 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 90+ variétés</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/33" alt="Fleurs saisonnières" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Fleurs saisonnières</h3>
+            <p class="text-sage-500 text-sm mb-4">Des fleurs colorées pour égayer vos massifs et balcons : pétunias, géraniums, surfinias…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 3,50 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 100+ variétés</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/44" alt="Plantes aromatiques" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div class="absolute top-4 left-4 bg-terra-500/90 text-white text-xs font-bold px-3 py-1.5 rounded-full">Nouveau</div>
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Plantes aromatiques</h3>
+            <p class="text-sage-500 text-sm mb-4">Basilic, thym, romarin, ciboulette, sauge… Des herbes fraîches pour parfumer votre cuisine.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 2,90 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 40+ variétés</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/66" alt="Petits arbustes décoratifs" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Petits arbustes</h3>
+            <p class="text-sage-500 text-sm mb-4">Buis, hortensias, lavandes, rosiers… Des arbustes décoratifs pour structurer votre jardin.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 4,90 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 60+ variétés</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/77" alt="Plantes d'intérieur" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Plantes d'intérieur</h3>
+            <p class="text-sage-500 text-sm mb-4">Monstera, ficus, succulentes… Apportez une touche de verdure dans votre maison.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 5,50 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 50+ variétés</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 6 -->
+        <div class="card-hover rounded-2xl overflow-hidden shadow-md bg-white group fade-in">
+          <div class="relative overflow-hidden aspect-[4/3]">
+            <img src="http://static.photos/nature/640x360/99" alt="Plantes décoratives" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl font-bold text-forest-900 mb-2">Plantes décoratives</h3>
+            <p class="text-sage-500 text-sm mb-4">Plantes grasses, suspensions, compositions… Des idées cadeaux végétales originales.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-terra-500 font-semibold">Dès 6,90 €</span>
+              <span class="text-sage-400 text-sm flex items-center gap-1"><i data-lucide="package" class="w-4 h-4"></i> 30+ variétés</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Opening Hours Section -->
+  <section class="py-16 md:py-20 bg-forest-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div class="fade-in">
+          <span class="text-terra-500 font-semibold text-sm uppercase tracking-wider">Horaires d'ouverture</span>
+          <h2 class="font-display text-3xl md:text-4xl font-bold text-forest-900 mt-3 mb-6">Venez nous rendre visite</h2>
+          <p class="text-sage-600 leading-relaxed mb-6">
+            Notre pépinière vous accueille du lundi au samedi. Profitez de nos espaces pour flâner et choisir vos plantes en toute tranquillité.
+          </p>
+          <div class="flex items-center gap-3 bg-green-100 text-green-800 px-4 py-3 rounded-xl text-sm font-medium">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span>Actuellement ouvert — Bienvenue !</span>
+          </div>
+        </div>
+        <div class="fade-in">
+          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <div class="space-y-4">
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Lundi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Mardi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Mercredi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Jeudi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Vendredi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3 border-b border-sage-100">
+                <span class="font-semibold text-forest-900">Samedi</span>
+                <span class="text-sage-600">10h–12h | 14h–19h</span>
+              </div>
+              <div class="flex justify-between items-center py-3">
+                <span class="font-semibold text-forest-900">Dimanche</span>
+                <span class="text-red-500 font-medium">Fermé</span>
+              </div>
+            </div>
+            <div class="mt-6 bg-terra-50 border border-terra-200 rounded-xl p-4 text-sm text-terra-700">
+              <div class="flex items-start gap-2">
+                <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                <p><strong>Ventes saisonnières :</strong> deux fois par an — une au printemps et une à la Toussaint. Au plaisir de vous accueillir ! 🌷🍂</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Reviews Section -->
+  <section id="reviews" class="py-20 md:py-28 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14 fade-in">
+        <span class="text-terra-500 font-semibold text-sm uppercase tracking-wider">Témoignages</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-forest-900 mt-3 mb-4">Ce que disent nos clients</h2>
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div class="flex">
+            <i data-lucide="star" class="w-6 h-6 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-6 h-6 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-6 h-6 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-6 h-6 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-6 h-6 star-filled fill-current" style="clip-path: inset(0 40% 0 0);"></i>
+          </div>
+          <span class="text-forest-900 font-bold text-lg">4.6</span>
+          <span class="text-sage-400">/5</span>
+        </div>
+        <p class="text-sage-500">Basé sur 19 avis Google</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Review 1 -->
+        <div class="review-card bg-sage-50 rounded-2xl p-6 fade-in">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 bg-forest-200 rounded-full flex items-center justify-center text-forest-700 font-bold text-lg">C</div>
+            <div>
+              <p class="font-semibold text-forest-900">Christine Grandemange</p>
+              <p class="text-xs text-sage-400">Il y a 2 mois — Visité en février</p>
+            </div>
+          </div>
+          <div class="flex mb-3">
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+          </div>
+          <p class="text-sage-600 text-sm leading-relaxed">Hâte de retourner acheter mes fleurs de printemps. Et de retrouver cette équipe dynamique et toujours de bons conseils. 🌷</p>
+        </div>
+        <!-- Review 2 -->
+        <div class="review-card bg-sage-50 rounded-2xl p-6 fade-in">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 bg-terra-200 rounded-full flex items-center justify-center text-terra-700 font-bold text-lg">O</div>
+            <div>
+              <p class="font-semibold text-forest-900">Olivier Roy</p>
+              <p class="text-xs text-sage-400">Il y a 1 an — Visité en avril 2025</p>
+            </div>
+          </div>
+          <div class="flex mb-3">
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-filled fill-current"></i>
+          </div>
+          <p class="text-sage-600 text-sm leading-relaxed">Un magnifique endroit pour choisir toutes sortes de plantes potagères, aromatiques ou décoratives, de fleurs et de petits arbustes. L'accueil est très chaleureux et les conseils sont précieux. 🌿</p>
+        </div>
+        <!-- Review 3 -->
+        <div class="review-card bg-sage-50 rounded-2xl p-6 fade-in">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 bg-red-200 rounded-full flex items-center justify-center text-red-700 font-bold text-lg">M</div>
+            <div>
+              <p class="font-semibold text-forest-900">Mam's</p>
+              <p class="text-xs text-sage-400">Il y a 5 mois — Visité en novembre</p>
+            </div>
+          </div>
+          <div class="flex mb-3">
+            <i data-lucide="star" class="w-4 h-4 star-empty fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-empty fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-empty fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-empty fill-current"></i>
+            <i data-lucide="star" class="w-4 h-4 star-empty fill-current"></i>
+          </div>
+          <p class="text-sage-600 text-sm leading-relaxed">Accueil téléphonique très désagréable. Ça ne donne pas envie de venir acheter…</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-10">
+        <a href="#" class="inline-flex items-center gap-2 bg-forest-600 hover:bg-forest-700 text-white px-6 py-3 rounded-full font-medium transition-colors">
+          <i data-lucide="external-link" class="w-4 h-4"></i>
+          Voir tous les avis sur Google
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="relative py-20 md:py-24 overflow-hidden">
+    <div class="absolute inset-0">
+      <img src="http://static.photos/nature/1200x630/42" alt="Jardin" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-forest-900/80"></div>
+    </div>
+    <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-6">Prêt à transformer votre jardin ?</h2>
+      <p class="text-forest-200 text-lg mb-8 max-w-2xl mx-auto">Découvrez nos plantes en personne. Notre équipe vous attend pour vous conseiller et vous aider à réaliser le jardin de vos rêves.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="mailto:contact@gemaflor.fr" class="bg-terra-500 hover:bg-terra-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg inline-flex items-center justify-center gap-2">
+          <i data-lucide="mail" class="w-5 h-5"></i>
+          Nous écrire
+        </a>
+        <a href="#contact" class="border-2 border-white/40 hover:border-white text-white px-8 py-4 rounded-full font-semibold text-lg transition-all hover:bg-white/10 inline-flex items-center justify-center gap-2">
+          <i data-lucide="map-pin" class="w-5 h-5"></i>
+          Nous trouver
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 md:py-28 bg-sage-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14 fade-in">
+        <span class="text-terra-500 font-semibold text-sm uppercase tracking-wider">Contact</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold text-forest-900 mt-3 mb-4">Venez nous voir</h2>
+        <p class="text-sage-500 text-lg">Notre pépinière vous ouvre ses portes à Gerzat, au cœur du Puy-de-Dôme, près de Clermont-Ferrand.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 fade-in">
+        <!-- Map -->
+        <div class="rounded-2xl overflow-hidden shadow-lg h-[400px] md:h-full min-h-[400px]">
+          <iframe 
+            src="https://maps.google.com/maps?q=G%C3%A9maflor+Les+Bas+Charmets+63360+Gerzat+France&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            class="w-full h-full">
+          </iframe>
+        </div>
+        <!-- Contact Details -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-2xl p-6 shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="bg-forest-100 p-3 rounded-xl flex-shrink-0">
+                <i data-lucide="map-pin" class="w-6 h-6 text-forest-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-forest-900 text-lg mb-1">Adresse</h3>
+                <p class="text-sage-600">Les Bas Charmets<br>63360 Gerzat, France</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="bg-forest-100 p-3 rounded-xl flex-shrink-0">
+                <i data-lucide="mail" class="w-6 h-6 text-forest-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-forest-900 text-lg mb-1">Email</h3>
+                <a href="mailto:contact@gemaflor.fr" class="text-terra-500 font-semibold text-lg hover:text-terra-600 transition-colors">contact@gemaflor.fr</a>
+                <p class="text-sage-400 text-sm mt-1">Réponse sous 24h en moyenne</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="bg-forest-100 p-3 rounded-xl flex-shrink-0">
+                <i data-lucide="clock" class="w-6 h-6 text-forest-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-forest-900 text-lg mb-1">Horaires</h3>
+                <p class="text-sage-600">Lundi – Samedi : <strong>10h–12h | 14h–19h</strong></p>
+                <p class="text-sage-600">Dimanche : <strong class="text-red-500">Fermé</strong></p>
+                <p class="text-sage-400 text-sm mt-1">Ventes au printemps et à la Toussaint</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="bg-forest-100 p-3 rounded-xl flex-shrink-0">
+                <i data-lucide="calendar" class="w-6 h-6 text-forest-600"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-forest-900 text-lg mb-1">Ventes saisonnières</h3>
+                <p class="text-sage-600"><strong>Printemps</strong> — Fleurs & plants de légumes</p>
+                <p class="text-sage-600"><strong>Toussaint</strong> — Végétaux de saison</p>
+                <p class="text-sage-400 text-sm mt-1">Du lundi au samedi, 10h–12h & 14h–19h</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-forest-900 text-forest-200 py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">🌱</span>
+            <span class="font-display text-2xl font-bold text-white">Gémaflor</span>
+          </div>
+          <p class="text-forest-300 text-sm leading-relaxed">Production horticole locale à Gerzat. Vente de fleurs et de plants de légumes, deux fois par an.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Navigation</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#about" class="hover:text-white transition-colors">À propos</a></li>
+            <li><a href="#plants" class="hover:text-white transition-colors">Nos plantes</a></li>
+            <li><a href="#reviews" class="hover:text-white transition-colors">Avis clients</a></li>
+            <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Nos catégories</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Plantes potagères</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Fleurs saisonnières</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Plantes aromatiques</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Petits arbustes</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Plantes décoratives</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Contact</h4>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+              <span>Les Bas Charmets, 63360 Gerzat</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="mail" class="w-4 h-4 flex-shrink-0"></i>
+              <a href="mailto:contact@gemaflor.fr" class="hover:text-white transition-colors">contact@gemaflor.fr</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-forest-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-forest-400 text-sm">&copy; 2024 Gémaflor. Tous droits réservés.</p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="bg-forest-700 hover:bg-forest-600 p-2.5 rounded-lg transition-colors" aria-label="Facebook">
+            <i data-lucide="facebook" class="w-5 h-5"></i>
+          </a>
+          <a href="#" class="bg-forest-700 hover:bg-forest-600 p-2.5 rounded-lg transition-colors" aria-label="Instagram">
+            <i data-lucide="instagram" class="w-5 h-5"></i>
+          </a>
+          <a href="#" class="bg-forest-700 hover:bg-forest-600 p-2.5 rounded-lg transition-colors" aria-label="Google">
+            <i data-lucide="globe" class="w-5 h-5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <button id="backToTop" class="fixed bottom-6 right-6 z-40 bg-forest-600 hover:bg-forest-700 text-white p-3 rounded-full shadow-lg transition-all opacity-0 translate-y-4 pointer-events-none">
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('overlay');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    function openMenu() {
+      mobileMenu.classList.add('open');
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      mobileMenu.classList.remove('open');
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    closeMenuBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+    mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll > 50) {
+        navbar.classList.add('shadow-md');
+      } else {
+        navbar.classList.remove('shadow-md');
+      }
+      lastScroll = currentScroll;
+    });
+
+    // Back to top button
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 600) {
+        backToTop.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        backToTop.classList.add('opacity-100', 'translate-y-0');
+      } else {
+        backToTop.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        backToTop.classList.remove('opacity-100', 'translate-y-0');
+      }
+    });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Dynamic open/closed status
+    function updateOpenStatus() {
+      const now = new Date();
+      const day = now.getDay(); // 0 = Sunday
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const time = hours + minutes / 60;
+
+      const statusEl = document.querySelector('.bg-green-100, .bg-red-50');
+      if (!statusEl) return;
+
+      let isOpen = false;
+      if (day >= 1 && day <= 6) { // Monday to Saturday
+        if ((time >= 10 && time <= 12) || (time >= 14 && time <= 19)) {
+          isOpen = true;
+        }
+      }
+
+      if (isOpen) {
+        statusEl.className = 'flex items-center gap-3 bg-green-100 text-green-800 px-4 py-3 rounded-xl text-sm font-medium';
+        statusEl.innerHTML = '<i data-lucide="check-circle" class="w-5 h-5"></i><span>Actuellement ouvert — Bienvenue !</span>';
+      } else {
+        statusEl.className = 'flex items-center gap-3 bg-red-50 text-red-700 px-4 py-3 rounded-xl text-sm font-medium';
+        statusEl.innerHTML = '<i data-lucide="x-circle" class="w-5 h-5"></i><span>Actuellement fermé — À bientôt !</span>';
+      }
+      lucide.createIcons();
+    }
+
+    updateOpenStatus();
+    setInterval(updateOpenStatus, 60000);
+  </script>
+<script src="https://deepsite.hf.co/deepsite-badge.js"></script>
+</body>
+</html>
